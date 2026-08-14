@@ -162,7 +162,7 @@ function renderSidebar() {
   return `
     <div class="sidebar-header">
       <a href="#dashboard" class="brand">
-        <span class="brand-mark">&lt;/&gt;</span>
+        <img src="codevent-logo.PNG" alt="CodeVent Digital logo" class="brand-mark-img">
         <span class="brand-name">CodeVent Digital</span>
       </a>
       <div class="brand-course">CodeVent Web Development</div>
