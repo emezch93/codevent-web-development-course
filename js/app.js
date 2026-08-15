@@ -1,5 +1,158 @@
 /* CodeVent Web Development — application logic */
+/* CodeVent Web Development — access control */
 
+const COURSE_WORKER_URL =
+  "https://codevent-web-development-course.emezch93.workers.dev";
+
+const ACCESS_TOKEN_KEY =
+  "codevent_webdev_access_token";
+
+const ACCESS_PAGE =
+  "access.html";
+
+let COURSE_ACCESS_VERIFIED = false;
+
+
+/* ---------- Course access verification ---------- */
+
+async function verifyCourseAccess() {
+
+  const token =
+    localStorage.getItem(
+      ACCESS_TOKEN_KEY
+    );
+
+  if (!token) {
+
+    showAccessRequired(
+      "A valid course access PIN is required."
+    );
+
+    return false;
+
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        COURSE_WORKER_URL +
+        "/verify-access",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "Accept":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            token
+          }),
+
+          cache: "no-store"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      data.authorized !== true
+    ) {
+
+      localStorage.removeItem(
+        ACCESS_TOKEN_KEY
+      );
+
+      showAccessRequired(
+        data.message ||
+        "Your course access is invalid or expired."
+      );
+
+      return false;
+
+    }
+
+    COURSE_ACCESS_VERIFIED =
+      true;
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      "Course access verification failed:",
+      error
+    );
+
+    showAccessRequired(
+      "Unable to verify course access. Please try again."
+    );
+
+    return false;
+
+  }
+
+}
+
+
+function showAccessRequired(
+  message
+) {
+
+  const content =
+    document.getElementById(
+      "content"
+    );
+
+  const sidebar =
+    document.getElementById(
+      "sidebar"
+    );
+
+  if (sidebar) {
+    sidebar.innerHTML = "";
+  }
+
+  if (!content) {
+    return;
+  }
+
+  content.innerHTML = `
+    <section class="course-access-required">
+
+      <div class="course-access-card">
+
+        <div class="course-access-label">
+          CODEVENT DIGITAL
+        </div>
+
+        <h1>
+          Course Access Required
+        </h1>
+
+        <p>
+          ${escapeHtml(message)}
+        </p>
+
+        <a
+          href="${ACCESS_PAGE}"
+          class="continue-btn"
+        >
+          Unlock Course
+        </a>
+
+      </div>
+
+    </section>
+  `;
+
+}
 const STORAGE_KEY = "codevent_progress_v1";
 const LAST_KEY = "codevent_last_v1";
 
