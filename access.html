@@ -1,13 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course Access | CodeVent Digital</title>
-<meta name="description" content="Activate your CodeVent Digital Web Development Course access.">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+  Course Access | CodeVent Digital
+</title>
+
+<meta
+  name="description"
+  content="Activate your CodeVent Digital Web Development Course access."
+>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -21,7 +35,10 @@ body {
   padding: 24px;
   background: #f5f7fa;
   color: #111827;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
 .container {
@@ -31,13 +48,12 @@ body {
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 15px 40px
+    rgba(0, 0, 0, 0.08);
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 28px;
 }
 
@@ -94,16 +110,19 @@ p {
   font-family: monospace;
   font-size: 14px;
   word-break: break-all;
-  margin: 10px 0 16px;
+  margin:
+    10px 0 16px;
 }
 
 input {
   width: 100%;
   padding: 13px;
-  border: 1px solid #d1d5db;
+  border:
+    1px solid #d1d5db;
   border-radius: 9px;
   font-size: 16px;
-  margin: 8px 0 10px;
+  margin:
+    8px 0 10px;
 }
 
 button,
@@ -112,7 +131,8 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 13px 16px;
+  padding:
+    13px 16px;
   border: 0;
   border-radius: 9px;
   background: #111827;
@@ -131,7 +151,9 @@ button,
 .small {
   font-size: 13px;
 }
+
 </style>
+
 </head>
 
 <body>
@@ -139,7 +161,9 @@ button,
 <main class="container">
 
   <div class="brand">
-    <span class="brand-name">CodeVent Digital</span>
+    <span class="brand-name">
+      CodeVent Digital
+    </span>
   </div>
 
   <div class="label">
@@ -151,27 +175,41 @@ button,
   </h1>
 
   <p>
-    Activate your course access after completing payment.
+    Your payment is being verified.
+    Please wait.
   </p>
 
-  <div id="status" class="status">
+  <div
+    id="status"
+    class="status"
+  >
     Checking payment...
   </div>
 
-  <section id="tokenSection" class="token-section">
+  <section
+    id="tokenSection"
+    class="token-section"
+  >
 
     <p>
-      <strong>Your course access PIN</strong>
+      <strong>
+        Your course access PIN
+      </strong>
     </p>
 
-    <div id="token" class="token"></div>
+    <div
+      id="token"
+      class="token"
+    ></div>
 
-    <button id="copyButton" type="button">
+    <button
+      id="copyButton"
+      type="button"
+    >
       Copy PIN
     </button>
 
     <a
-      id="courseLink"
       class="course-link secondary"
       href="https://codevent-web-development-course.emezch93.workers.dev/"
     >
@@ -179,7 +217,8 @@ button,
     </a>
 
     <p class="small">
-      Keep this PIN safe. You will need it to unlock the course.
+      Keep this PIN safe.
+      You will need it to unlock the course.
     </p>
 
   </section>
@@ -197,7 +236,10 @@ button,
       autocomplete="off"
     >
 
-    <button id="verifyButton" type="button">
+    <button
+      id="verifyButton"
+      type="button"
+    >
       Verify PIN
     </button>
 
@@ -217,42 +259,65 @@ const TOKEN_STORAGE =
   "codevent_webdev_access_token";
 
 const statusElement =
-  document.getElementById("status");
+  document.getElementById(
+    "status"
+  );
 
 const tokenSection =
-  document.getElementById("tokenSection");
+  document.getElementById(
+    "tokenSection"
+  );
 
 const tokenElement =
-  document.getElementById("token");
+  document.getElementById(
+    "token"
+  );
 
 const accessTokenInput =
-  document.getElementById("accessToken");
+  document.getElementById(
+    "accessToken"
+  );
 
 const verifyButton =
-  document.getElementById("verifyButton");
+  document.getElementById(
+    "verifyButton"
+  );
 
 const copyButton =
-  document.getElementById("copyButton");
+  document.getElementById(
+    "copyButton"
+  );
 
-function setStatus(message, type = "") {
+function setStatus(
+  message,
+  type = ""
+) {
 
-  statusElement.textContent = message;
+  statusElement.textContent =
+    message;
 
-  statusElement.className = "status";
+  statusElement.className =
+    "status";
 
   if (type) {
-    statusElement.classList.add(type);
+    statusElement.classList.add(
+      type
+    );
   }
 }
 
 function showToken(token) {
 
-  tokenElement.textContent = token;
+  tokenElement.textContent =
+    token;
 
-  tokenSection.style.display = "block";
+  tokenSection.style.display =
+    "block";
 }
 
-async function verifyAccessToken(token) {
+async function verifyAccessToken(
+  token
+) {
 
   if (!token) {
 
@@ -264,21 +329,31 @@ async function verifyAccessToken(token) {
     return;
   }
 
-  setStatus("Verifying PIN...");
+  setStatus(
+    "Verifying PIN..."
+  );
 
   try {
 
     const response =
       await fetch(
-        WORKER_URL + "/verify-payment",
+        WORKER_URL +
+        "/verify-access",
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json",
+            "Accept":
+              "application/json"
           },
+
           body: JSON.stringify({
             token: token
-          })
+          }),
+
+          cache: "no-store"
         }
       );
 
@@ -314,6 +389,11 @@ async function verifyAccessToken(token) {
 
   } catch (error) {
 
+    console.error(
+      "PIN verification error:",
+      error
+    );
+
     setStatus(
       "Unable to verify the PIN. Please try again.",
       "error"
@@ -328,7 +408,9 @@ verifyButton.addEventListener(
     const token =
       accessTokenInput.value.trim();
 
-    verifyAccessToken(token);
+    verifyAccessToken(
+      token
+    );
   }
 );
 
@@ -341,17 +423,19 @@ copyButton.addEventListener(
 
     try {
 
-      await navigator.clipboard.writeText(
-        token
-      );
+      await navigator.clipboard
+        .writeText(token);
 
       copyButton.textContent =
         "Copied";
 
-      setTimeout(() => {
-        copyButton.textContent =
-          "Copy PIN";
-      }, 2000);
+      setTimeout(
+        () => {
+          copyButton.textContent =
+            "Copy PIN";
+        },
+        2000
+      );
 
     } catch {
 
@@ -371,7 +455,9 @@ async function verifyPayment() {
     );
 
   const reference =
-    params.get("reference");
+    params.get(
+      "reference"
+    );
 
   if (!reference) {
 
@@ -389,16 +475,30 @@ async function verifyPayment() {
 
   try {
 
+    const verificationUrl =
+      WORKER_URL +
+      "/verify-payment?reference=" +
+      encodeURIComponent(
+        reference
+      );
+
+    console.log(
+      "Verifying:",
+      verificationUrl
+    );
+
     const response =
       await fetch(
-        WORKER_URL +
-        "/verify-payment?reference=" +
-        encodeURIComponent(reference),
+        verificationUrl,
         {
           method: "GET",
+
           headers: {
-            "Accept": "application/json"
-          }
+            "Accept":
+              "application/json"
+          },
+
+          cache: "no-store"
         }
       );
 
@@ -436,6 +536,11 @@ async function verifyPayment() {
 
   } catch (error) {
 
+    console.error(
+      "Payment verification error:",
+      error
+    );
+
     setStatus(
       "Unable to verify payment. Please try again.",
       "error"
@@ -448,5 +553,5 @@ verifyPayment();
 </script>
 
 </body>
-</html>
 
+</html>
