@@ -175,6 +175,18 @@ function renderSidebar() {
       <div class="progress-track"><div class="progress-fill" style="width:${progressPercent()}%"></div></div>
     </div>
     <nav class="nav-modules">${modulesHtml}</nav>
+    <div class="sidebar-help">
+      <a href="https://codeventdigital.site/chat.html" target="_blank" class="ai-help-link">
+        <span class="ai-help-icon">AI</span>
+        <span>Stuck? Ask the CodeVent AI Tutor</span>
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+    </div>
   `;
 }
 
@@ -199,6 +211,14 @@ function practiceBlock(practice, lessonId) {
         <div class="reveal-label">Solution</div>
         ${codeBlock(practice.solution, "CODE")}
       </div>
+    </div>`;
+}
+
+function aiHelpCallout(label) {
+  return `
+    <div class="ai-callout">
+      <p>Stuck on ${escapeHtml(label)}? The CodeVent AI Tutor can walk through it with you.</p>
+      <a href="https://codeventdigital.site/chat.html" target="_blank" class="ai-callout-link">Ask the AI Tutor</a>
     </div>`;
 }
 
@@ -254,6 +274,10 @@ function renderLessonView(mod, lesson) {
       <p>${escapeHtml(lesson.miniTask)}</p>
     </section>
 
+    <section class="lesson-section">
+      ${aiHelpCallout("this lesson")}
+    </section>
+
     <div class="lesson-footer">
       <button class="complete-btn ${completed ? "done" : ""}" type="button" data-complete="${lesson.id}">
         ${completed ? "Lesson Complete" : "Complete Lesson"}
@@ -295,6 +319,10 @@ function renderProjectView(mod, project) {
     ${list(project.tasks, "Coding Tasks")}
     ${project.challenge ? `<section class="lesson-section"><h2>Final Challenge</h2><p>${escapeHtml(project.challenge)}</p></section>` : ""}
 
+    <section class="lesson-section">
+      ${aiHelpCallout("this project")}
+    </section>
+
     <div class="lesson-footer">
       <button class="complete-btn ${completed ? "done" : ""}" type="button" data-complete="${project.id}">
         ${completed ? "Project Complete" : "Mark Project Complete"}
@@ -328,6 +356,9 @@ function renderCapstoneView(mod, capstone) {
     <section class="lesson-section">
       <h2>Evaluation Checklist</h2>
       <ul class="checklist">${capstone.checklist.map((c, i) => `<li><label><input type="checkbox" data-checklist="${capstone.id}-${i}"> ${escapeHtml(c)}</label></li>`).join("")}</ul>
+    </section>
+    <section class="lesson-section">
+      ${aiHelpCallout("the capstone project")}
     </section>
     <div class="lesson-footer">
       <button class="complete-btn ${completed ? "done" : ""}" type="button" data-complete="${capstone.id}">
