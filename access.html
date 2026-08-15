@@ -1,1 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Course Access | CodeVent Digital</title>
+
+<meta
+  name="description"
+  content="Activate your CodeVent Digital Web Development Course access."
+>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f5f7fa;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6b7280;
+}
+
+h1 {
+  margin: 8px 0 12px;
+  font-size: 30px;
+}
+
+p {
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.status {
+  margin: 22px 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status.success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.status.error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.token-section {
+  display: none;
+  margin-top: 24px;
+}
+
+.token {
+  background: #111827;
+  color: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 18px;
+  word-break: break-all;
+  margin: 10px 0 16px;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 16px;
+  margin: 8px 0 10px;
+}
+
+button,
+.course-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 8px;
+}
+
+.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.small {
+  font-size: 13px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<main class="container">
+
+  <div class="brand">
+    <span class="brand-name">CodeVent Digital</span>
+  </div>
+
+  <div class="label">
+    Course Access
+  </div>
+
+  <h1>
+    Web Development
+  </h1>
+
+  <p>
+    Your payment is being verified. Please wait.
+  </p>
+
+  <div
+    id="status"
+    class="status"
+  >
+    Checking payment...
+  </div>
+
+  <section
+    id="tokenSection"
+    class="token-section"
+  >
+
+    <p>
+      <strong>Your course access PIN</strong>
+    </p>
+
+    <div
+      id="token"
+      class="token"
+    ></div>
+
+    <button
+      id="copyButton"
+      type="button"
+    >
+      Copy PIN
+    </button>
+
+    <a
+      class="course-link secondary"
+      href="https://codevent-web-development.emezch93.workers.dev/"
+    >
+      Continue to Course
+    </a>
+
+    <p class="small">
+      Keep this PIN safe. You will need it to unlock the course.
+    </p>
+
+  </section>
+
+  <section>
+
+    <p>
+      Already have your course PIN?
+    </p>
+
+    <input
+      id="accessToken"
+      type="text"
+      placeholder="Enter your course PIN"
+      autocomplete="off"
+    >
+
+    <button
+      id="verifyButton"
+      type="button"
+    >
+      Verify PIN
+    </button>
+
+  </section>
+
+</main>
+
+<script>
+
+const WORKER_URL =
+  "https://codevent-web-development.emezch93.workers.dev";
+
+const COURSE_URL =
+  "https://codevent-web-development.emezch93.workers.dev/";
+
+const TOKEN_STORAGE =
+  "codevent_webdev_access_token";
+
+const statusElement =
+  document.getElementById("status");
+
+const tokenSection =
+  document.getElementById("tokenSection");
+
+const tokenElement =
+  document.getElementById("token");
+
+function setStatus(message, type = "") {
+
+  statusElement.textContent = message;
+
+  statusElement.className = "status";
+
+  if (type) {
+    statusElement.classList.add(type);
+  }
+
+}
+
+function showToken(token) {
+
+  tokenElement.textContent = token;
+
+  tokenSection.style.display = "block";
+
+}
+
+async function verifyAccessToken(token) {
+
+  if (!token) {
+
+    setStatus(
+      "Please enter your course PIN.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  setStatus(
+    "Verifying PIN..."
+  );
+
+  try {
+
+    const response =
+      await fetch(
+        WORKER_URL + "/verify-access",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            token: token
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.authorized
+    ) {
+
+      setStatus(
+        data.message ||
+        "Invalid course PIN.",
+        "error"
+      );
+
+      return;
+
+    }
+
+    localStorage.setItem(
+      TOKEN_STORAGE,
+      token
+    );
+
+    setStatus(
+      "PIN verified.",
+      "success"
+    );
+
+    window.location.href =
+      COURSE_URL;
+
+  } catch {
+
+    setStatus(
+      "Unable to verify the PIN. Please try again.",
+      "error"
+    );
+
+  }
+
+}
+
+document
+  .getElementById("verifyButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      const token =
+        document
+          .getElementById("accessToken")
+          .value
+          .trim();
+
+      verifyAccessToken(token);
+
+    }
+  );
+
+document
+  .getElementById("copyButton")
+  .addEventListener(
+    "click",
+    async () => {
+
+      const token =
+        tokenElement.textContent;
+
+      await navigator.clipboard.writeText(
+        token
+      );
+
+      document
+        .getElementById("copyButton")
+        .textContent = "Copied";
+
+    }
+  );
+
+async function verifyPayment() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const reference =
+    params.get("reference");
+
+  if (!reference) {
+
+    setStatus(
+      "No payment reference was found. Enter your course PIN below.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  setStatus(
+    "Verifying your payment..."
+  );
+
+  try {
+
+    const response =
+      await fetch(
+        WORKER_URL +
+        "/verify-payment?reference=" +
+        encodeURIComponent(reference)
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.authorized
+    ) {
+
+      setStatus(
+        data.message ||
+        "Payment could not be verified.",
+        "error"
+      );
+
+      return;
+
+    }
+
+    localStorage.setItem(
+      TOKEN_STORAGE,
+      data.token
+    );
+
+    showToken(
+      data.token
+    );
+
+    setStatus(
+      "Payment verified. Your course PIN is ready.",
+      "success"
+    );
+
+  } catch {
+
+    setStatus(
+      "Unable to verify payment. Please try again.",
+      "error"
+    );
+
+  }
+
+}
+
+verifyPayment();
+
+</script>
+
+</body>
+</html>
