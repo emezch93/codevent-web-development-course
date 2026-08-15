@@ -101,7 +101,8 @@ function codeBlock(code, lang) {
 function codeGroup(codeObj) {
   if (!codeObj) return "";
   const langs = Object.keys(codeObj);
-  return `<div class="code-group">${langs.map((l) => codeBlock(codeObj[l], l.toUpperCase())).join("")}</div>`;
+  const blocks = langs.map((l) => codeBlock(codeObj[l], l.toUpperCase())).join("");
+  return `<div class="code-group">${blocks}<a href="https://codeventdigital.site/code-editor.html" target="_blank" class="editor-link">Open in Code Editor</a></div>`;
 }
 
 function attachCopyHandlers(root) {
@@ -179,6 +180,10 @@ function renderSidebar() {
       <a href="https://codeventdigital.site/chat.html" target="_blank" class="ai-help-link">
         <span class="ai-help-icon">AI</span>
         <span>Stuck? Ask the CodeVent AI Tutor</span>
+      </a>
+      <a href="https://codeventdigital.site/code-editor.html" target="_blank" class="ai-help-link">
+        <span class="ai-help-icon mono">&lt;/&gt;</span>
+        <span>Open the Code Editor</span>
       </a>
     </div>
     <div class="sidebar-footer">
