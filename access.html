@@ -270,7 +270,7 @@ async function verifyAccessToken(token) {
 
     const response =
       await fetch(
-        WORKER_URL + "/verify-access",
+        WORKER_URL + "/verify-payment",
         {
           method: "POST",
           headers: {
