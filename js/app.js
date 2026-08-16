@@ -32,7 +32,7 @@ function authGateHtml(message = "Enter the access token you received after compl
           <button type="submit" class="auth-retry-btn">Unlock Course</button>
         </form>
         <p id="auth-error" class="auth-error" role="alert">${escapeHtml(error)}</p>
-         <a href="contact.html" target="_blank">Don't have a token? Contact us for course access</a>
+         <a class="auth-gate-pay-link" href="contact.html" target="_blank">Don't have a token? Contact us for course access</a>
       </div>
     </div>`;
 }
