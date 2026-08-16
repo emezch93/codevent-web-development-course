@@ -132,7 +132,7 @@ h1 {
   <div id="status" class="status">Checking payment...</div>
 
   <a id="courseLink" class="course-link" href="https://emezch93.github.io/codevent-web-development-course/" target="_self">
-    Go to Course
+    Unlock Course
   </a>
 
 </main>
@@ -216,14 +216,8 @@ async function verifyPayment() {
 
   localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
 
-  setStatus("Payment verified. Unlocking your course...", "success");
-
-  setTimeout(() => {
-    window.location.href = COURSE_URL;
-  }, 1200);
-
-  // Fallback in case the automatic redirect is blocked by the browser.
   stopSpinner();
+  setStatus("Payment verified. Your course access is ready.", "success");
   showCourseLink();
 }
 
