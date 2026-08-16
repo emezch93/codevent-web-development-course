@@ -5,11 +5,8 @@ const LAST_KEY = "codevent_last_v1";
 /* ---------- Course access authorization ---------- */
 const ACCESS_TOKEN_KEY = "codevent_webdev_access_token";
 const WORKER_URL = "https://codevent-web-development-course.emezch93.workers.dev";
-const ACCESS_PAGE_URL = "https://emezch93.github.io/codevent-web-development-course/access.html";
-
-function redirectToAccess() {
-  window.location.href = ACCESS_PAGE_URL;
-}
+const AUTH_STATES = Object.freeze({ LOCKED: "LOCKED", VERIFYING: "VERIFYING", UNLOCKED: "UNLOCKED" });
+let authorizationState = AUTH_STATES.LOCKED;
 
 function renderAuthState(html) {
   const content = document.getElementById("content");
@@ -19,18 +16,27 @@ function renderAuthState(html) {
 }
 
 function authLoadingHtml(message) {
-  return `<div class="auth-gate"><p class="auth-gate-message">${message}</p></div>`;
+  return `<div class="auth-gate"><div class="auth-spinner" aria-hidden="true"></div><p class="auth-gate-message">${message}</p></div>`;
 }
 
-function authErrorHtml(message) {
+function authGateHtml(message = "Enter the access token you received after completing payment.", error = "") {
   return `
     <div class="auth-gate">
-      <p class="auth-gate-message">${message}</p>
-      <button type="button" id="auth-retry-btn" class="auth-retry-btn">Retry</button>
+      <div class="auth-gate-card">
+        <div class="auth-gate-label">CodeVent Web Development</div>
+        <h1>Course Locked</h1>
+        <p class="auth-gate-message">${escapeHtml(message)}</p>
+        <form id="auth-unlock-form" class="auth-unlock-form">
+          <label for="access-token">Access token</label>
+          <input id="access-token" name="access-token" type="text" autocomplete="off" spellcheck="false" required placeholder="Paste your access token">
+          <button type="submit" class="auth-retry-btn">Unlock Course</button>
+        </form>
+        <p id="auth-error" class="auth-error" role="alert">${escapeHtml(error)}</p>
+      </div>
     </div>`;
 }
 
-async function verifyStoredAccess(token) {
+async function verifyAccess(token) {
   let response;
   try {
     response = await fetch(WORKER_URL + "/verify-access", {
@@ -40,44 +46,73 @@ async function verifyStoredAccess(token) {
       cache: "no-store"
     });
   } catch (err) {
-    return { networkError: true };
+    return { networkError: true, message: "Unable to reach the verification service. Check your connection and try again." };
   }
 
   let data;
   try {
     data = await response.json();
   } catch (err) {
-    return { networkError: true };
+    return { networkError: true, message: "Received an unexpected response from the verification service. Please try again." };
   }
 
-  return { networkError: false, authorized: !!data.authorized };
+  return {
+    networkError: false,
+    authorized: response.ok && data.authorized === true,
+    message: typeof data.message === "string" ? data.message : "This access token is invalid or has expired."
+  };
+}
+
+function showLockedState(message, error) {
+  authorizationState = AUTH_STATES.LOCKED;
+  renderAuthState(authGateHtml(message, error));
+  const form = document.getElementById("auth-unlock-form");
+  if (form) form.addEventListener("submit", handleManualUnlock);
+}
+
+async function handleManualUnlock(event) {
+  event.preventDefault();
+  const input = document.getElementById("access-token");
+  const token = input ? input.value.trim() : "";
+  if (!token) return;
+
+  authorizationState = AUTH_STATES.VERIFYING;
+  renderAuthState(authLoadingHtml("Verifying your access token..."));
+  const result = await verifyAccess(token);
+
+  if (result.authorized) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+    authorizationState = AUTH_STATES.UNLOCKED;
+    startApp();
+    return;
+  }
+
+  showLockedState("Enter the access token you received after completing payment.", result.message);
 }
 
 async function initAuth() {
   const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-
   if (!token) {
-    redirectToAccess();
+    showLockedState();
     return;
   }
 
+  authorizationState = AUTH_STATES.VERIFYING;
   renderAuthState(authLoadingHtml("Checking your course access..."));
-
-  const result = await verifyStoredAccess(token);
+  const result = await verifyAccess(token);
 
   if (result.networkError) {
-    renderAuthState(authErrorHtml("Unable to verify your course access right now. Check your connection and try again."));
-    const retryBtn = document.getElementById("auth-retry-btn");
-    if (retryBtn) retryBtn.addEventListener("click", initAuth);
+    showLockedState("Your saved token could not be checked right now. Check your connection and try again.", result.message);
     return;
   }
 
   if (!result.authorized) {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
-    redirectToAccess();
+    showLockedState("Enter the access token you received after completing payment.", result.message);
     return;
   }
 
+  authorizationState = AUTH_STATES.UNLOCKED;
   startApp();
 }
 
@@ -519,6 +554,7 @@ function renderDashboard() {
 
 /* ---------- Main render ---------- */
 function render() {
+  if (authorizationState !== AUTH_STATES.UNLOCKED) return;
   const id = currentId();
   const content = document.getElementById("content");
   const sidebar = document.getElementById("sidebar");
