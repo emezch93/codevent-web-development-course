@@ -24,7 +24,15 @@
       </button>
       <div class="topbar-title">CodeVent Web Development</div>
     </header>
-    <main id="content" class="content"></main>
+    <main id="content" class="content" aria-live="polite">
+      <section class="auth-gate" aria-labelledby="course-lock-title">
+        <div class="auth-gate-card">
+          <div class="auth-gate-label">CodeVent Web Development</div>
+          <h1 id="course-lock-title">Course Locked</h1>
+          <p class="auth-gate-message">Checking course access…</p>
+        </div>
+      </section>
+    </main>
   </div>
 </div>
 

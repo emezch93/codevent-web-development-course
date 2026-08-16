@@ -93,7 +93,7 @@ h1 {
   color: #991b1b;
 }
 
-.course-link {
+.course-link, .copy-token {
   display: none;
   width: 100%;
   align-items: center;
@@ -106,10 +106,31 @@ h1 {
   font-weight: 600;
   text-decoration: none;
   margin-top: 16px;
+  cursor: pointer;
+  font: inherit;
 }
 
-.course-link.visible {
+.course-link.visible, .copy-token.visible, .token-panel.visible {
   display: flex;
+}
+
+.copy-token { background: #e5e7eb; color: #111827; }
+.token-panel {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+  text-align: left;
+}
+.token-panel label { font-size: 13px; font-weight: 700; }
+.token-value {
+  margin: 0;
+  padding: 12px;
+  overflow-wrap: anywhere;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #f9fafb;
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 </style>
@@ -131,8 +152,15 @@ h1 {
 
   <div id="status" class="status">Checking payment...</div>
 
+  <div id="tokenPanel" class="token-panel">
+    <label for="tokenValue">Your Course Access Token</label>
+    <p id="tokenValue" class="token-value"></p>
+  </div>
+
+  <button id="copyToken" class="copy-token" type="button">Copy Token</button>
+
   <a id="courseLink" class="course-link" href="https://emezch93.github.io/codevent-web-development-course/" target="_self">
-    Unlock Course
+    Continue to Course
   </a>
 
 </main>
@@ -151,6 +179,10 @@ const ACCESS_TOKEN_KEY =
 const statusElement = document.getElementById("status");
 const spinnerElement = document.getElementById("spinner");
 const courseLinkElement = document.getElementById("courseLink");
+const tokenPanelElement = document.getElementById("tokenPanel");
+const tokenValueElement = document.getElementById("tokenValue");
+const copyTokenElement = document.getElementById("copyToken");
+let accessToken = "";
 
 function setStatus(message, type = "") {
   statusElement.textContent = message;
@@ -166,6 +198,22 @@ function stopSpinner() {
 
 function showCourseLink() {
   courseLinkElement.classList.add("visible");
+}
+
+function showToken(token) {
+  accessToken = token;
+  tokenValueElement.textContent = token;
+  tokenPanelElement.classList.add("visible");
+  copyTokenElement.classList.add("visible");
+}
+
+async function copyToken() {
+  try {
+    await navigator.clipboard.writeText(accessToken);
+    copyTokenElement.textContent = "Token Copied";
+  } catch (error) {
+    copyTokenElement.textContent = "Copy failed — select the token above";
+  }
 }
 
 async function verifyPayment() {
@@ -208,19 +256,20 @@ async function verifyPayment() {
     return;
   }
 
-  if (!response.ok || !data.authorized || !data.token) {
+  if (!response.ok || data.authorized !== true || typeof data.token !== "string" || !data.token) {
     stopSpinner();
     setStatus(data.message || "Payment could not be verified.", "error");
     return;
   }
 
-  localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
-
   stopSpinner();
-  setStatus("Payment verified. Your course access is ready.", "success");
+  setStatus("Payment verified. Your token has been saved on this browser; you can also copy it before continuing to the course.", "success");
+  showToken(data.token);
+  localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
   showCourseLink();
 }
 
+copyTokenElement.addEventListener("click", copyToken);
 verifyPayment();
 
 </script>
