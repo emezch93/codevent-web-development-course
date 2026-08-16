@@ -714,3 +714,32 @@ button { font-family: inherit; cursor: pointer; }
   .prev-next { flex-direction: column; }
   .pn-next { text-align: left; }
 }
+
+/* ============ Course access gate ============ */
+.auth-gate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 32px;
+}
+.auth-gate-message {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 360px;
+  margin: 0;
+}
+.auth-retry-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-retry-btn:hover { background: #3f7bef; }
