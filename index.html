@@ -29,7 +29,12 @@
         <div class="auth-gate-card">
           <div class="auth-gate-label">CodeVent Web Development</div>
           <h1 id="course-lock-title">Course Locked</h1>
-          <p class="auth-gate-message">Checking course access…</p>
+          <p class="auth-gate-message">Enter your access token to unlock this course.</p>
+          <form class="auth-unlock-form">
+            <label for="access-token">Access token</label>
+            <input id="access-token" type="text" autocomplete="off" spellcheck="false" required placeholder="Paste your access token">
+            <button type="submit" class="auth-retry-btn">Unlock Course</button>
+          </form>
         </div>
       </section>
     </main>
