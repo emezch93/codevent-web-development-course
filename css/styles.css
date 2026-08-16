@@ -229,6 +229,15 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 12px;
 }
 .sidebar-footer a:hover { color: var(--text); }
+.lock-course-btn {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+}
+.lock-course-btn:hover { color: var(--text); }
 
 .ai-callout {
   border: 1px dashed var(--border);
