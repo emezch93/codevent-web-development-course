@@ -2,6 +2,85 @@
 const STORAGE_KEY = "codevent_progress_v1";
 const LAST_KEY = "codevent_last_v1";
 
+/* ---------- Course access authorization ---------- */
+const ACCESS_TOKEN_KEY = "codevent_webdev_access_token";
+const WORKER_URL = "https://codevent-web-development-course.emezch93.workers.dev";
+const ACCESS_PAGE_URL = "https://emezch93.github.io/codevent-web-development-course/access.html";
+
+function redirectToAccess() {
+  window.location.href = ACCESS_PAGE_URL;
+}
+
+function renderAuthState(html) {
+  const content = document.getElementById("content");
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.innerHTML = "";
+  if (content) content.innerHTML = html;
+}
+
+function authLoadingHtml(message) {
+  return `<div class="auth-gate"><p class="auth-gate-message">${message}</p></div>`;
+}
+
+function authErrorHtml(message) {
+  return `
+    <div class="auth-gate">
+      <p class="auth-gate-message">${message}</p>
+      <button type="button" id="auth-retry-btn" class="auth-retry-btn">Retry</button>
+    </div>`;
+}
+
+async function verifyStoredAccess(token) {
+  let response;
+  try {
+    response = await fetch(WORKER_URL + "/verify-access", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ token }),
+      cache: "no-store"
+    });
+  } catch (err) {
+    return { networkError: true };
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (err) {
+    return { networkError: true };
+  }
+
+  return { networkError: false, authorized: !!data.authorized };
+}
+
+async function initAuth() {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+  if (!token) {
+    redirectToAccess();
+    return;
+  }
+
+  renderAuthState(authLoadingHtml("Checking your course access..."));
+
+  const result = await verifyStoredAccess(token);
+
+  if (result.networkError) {
+    renderAuthState(authErrorHtml("Unable to verify your course access right now. Check your connection and try again."));
+    const retryBtn = document.getElementById("auth-retry-btn");
+    if (retryBtn) retryBtn.addEventListener("click", initAuth);
+    return;
+  }
+
+  if (!result.authorized) {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    redirectToAccess();
+    return;
+  }
+
+  startApp();
+}
+
 /* ---------- Flatten course into a linear sequence for prev/next + progress ---------- */
 const SEQUENCE = [];
 COURSE.modules.forEach((mod) => {
@@ -506,11 +585,16 @@ function attachSidebarHandlers(root) {
 function closeMobileSidebar() {
   document.getElementById("app").classList.remove("sidebar-open");
 }
-document.addEventListener("DOMContentLoaded", () => {
+
+function startApp() {
   const toggle = document.getElementById("menu-toggle");
   toggle.addEventListener("click", () => {
     document.getElementById("app").classList.toggle("sidebar-open");
   });
   document.getElementById("overlay").addEventListener("click", closeMobileSidebar);
   render();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initAuth();
 });
