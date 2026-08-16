@@ -726,12 +726,45 @@ button { font-family: inherit; cursor: pointer; }
   text-align: center;
   padding: 32px;
 }
+.auth-gate-card {
+  width: min(100%, 460px);
+  padding: 30px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: left;
+}
+.auth-gate-card h1 {
+  margin: 6px 0 10px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.auth-gate-label {
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .auth-gate-message {
   color: var(--muted);
   font-size: 14px;
   max-width: 360px;
   margin: 0;
 }
+.auth-unlock-form { display: grid; gap: 10px; margin-top: 24px; }
+.auth-unlock-form label { color: var(--muted); font-size: 12px; font-weight: 600; }
+.auth-unlock-form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 11px 12px;
+  background: var(--code-bg);
+  color: var(--text);
+  font: 13px var(--font-mono);
+}
+.auth-unlock-form input:focus { border-color: var(--accent); outline: none; }
 .auth-retry-btn {
   background: var(--accent);
   color: #fff;
@@ -743,3 +776,13 @@ button { font-family: inherit; cursor: pointer; }
   cursor: pointer;
 }
 .auth-retry-btn:hover { background: #3f7bef; }
+.auth-error { min-height: 1.5em; margin: 14px 0 0; color: var(--danger); font-size: 13px; }
+.auth-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: auth-spin .8s linear infinite;
+}
+@keyframes auth-spin { to { transform: rotate(360deg); } }
