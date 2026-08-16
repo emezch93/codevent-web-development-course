@@ -70,6 +70,12 @@ function showLockedState(message, error) {
   if (form) form.addEventListener("submit", handleManualUnlock);
 }
 
+function lockCourse() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  closeMobileSidebar();
+  showLockedState("Course access has been cleared. Enter your access token to unlock this course again.");
+}
+
 async function handleManualUnlock(event) {
   event.preventDefault();
   const input = document.getElementById("access-token");
@@ -300,6 +306,7 @@ function renderSidebar() {
       </a>
     </div>
     <div class="sidebar-footer">
+      <button type="button" class="lock-course-btn" id="lock-course-btn">Lock Course</button>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="terms.html">Terms</a>
@@ -604,6 +611,9 @@ function attachChecklistHandlers(root) {
 }
 
 function attachSidebarHandlers(root) {
+  const lockButton = root.querySelector("#lock-course-btn");
+  if (lockButton) lockButton.addEventListener("click", lockCourse);
+
   root.querySelectorAll("[data-toggle]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const modId = btn.dataset.toggle;
